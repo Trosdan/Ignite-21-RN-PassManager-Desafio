@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 
 import { SearchBar } from "../../components/SearchBar";
 import { LoginDataItem } from "../../components/LoginDataItem";
+import { usePassStorage } from "../../hooks/PassStorageHook";
 
 import {
   Container,
@@ -25,15 +25,15 @@ export function Home() {
   const [searchListData, setSearchListData] = useState<LoginListDataProps>([]);
   const [data, setData] = useState<LoginListDataProps>([]);
 
+  const { loadPasswords } = usePassStorage();
+
   async function loadData() {
-    const response = await AsyncStorage.getItem("@passmanager:logins");
+    const list = await loadPasswords();
 
-    if (!response) return;
+    if (!list) return;
 
-    const searchList: LoginDataProps[] = response ? JSON.parse(response) : [];
-
-    setSearchListData(searchList);
-    setData(searchList);
+    setSearchListData(list);
+    setData(list);
   }
 
   useEffect(() => {

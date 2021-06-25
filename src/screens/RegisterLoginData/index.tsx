@@ -9,6 +9,7 @@ import uuid from "react-native-uuid";
 
 import { Input } from "../../components/Form/Input";
 import { Button } from "../../components/Form/Button";
+import { usePassStorage } from "../../hooks/PassStorageHook";
 
 import { Container, HeaderTitle, Form } from "./styles";
 
@@ -41,6 +42,8 @@ export function RegisterLoginData() {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
+  const { savePassword } = usePassStorage();
+
   async function handleRegister(formData: FormData) {
     const newLoginData = {
       id: String(uuid.v4()),
@@ -48,14 +51,7 @@ export function RegisterLoginData() {
     };
 
     try {
-      const response = await AsyncStorage.getItem("@passmanager:logins");
-
-      const searchList: LoginDataProps[] = response ? JSON.parse(response) : [];
-
-      await AsyncStorage.setItem(
-        "@passmanager:logins",
-        JSON.stringify([...searchList, newLoginData])
-      );
+      await savePassword(newLoginData);
       reset();
     } catch (error) {
       Alert.alert("Não foi possivel cadastrar");
